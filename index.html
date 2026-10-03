@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mock Viewer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #f6f8fa;
+      color: #24292f;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #d0d7de;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      z-index: 10;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #57606a;
+    }
+
+    select {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      background-color: #f6f8fa;
+      color: #24292f;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    select:hover {
+      background-color: #f3f4f6;
+    }
+
+    select:focus {
+      border-color: #0969da;
+      box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 57px);
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">Mock Showcase</div>
+    <div class="controls">
+      <label for="mockSelect">Select Mock:</label>
+      <select id="mockSelect">
+        <!-- Update or add your mock filenames here -->
+        <option value="mocks-1.html">Mock 1</option>
+        <option value="mocks-2.html">Mock 2</option>
+        <option value="mocks-3.html">Mock 3</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <iframe id="mockFrame" title="Mock Preview"></iframe>
+  </main>
+
+  <script>
+    const selectEl = document.getElementById('mockSelect');
+    const iframeEl = document.getElementById('mockFrame');
+
+    function loadMock(filename) {
+      iframeEl.src = filename;
+      
+      // Update URL search param without reloading page
+      const url = new URL(window.location);
+      url.searchParams.set('page', filename);
+      window.history.replaceState({}, '', url);
+    }
+
+    // Handle dropdown changes
+    selectEl.addEventListener('change', (e) => {
+      loadMock(e.target.value);
+    });
+
+    // On page load: check URL param or default to first select option
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const pageFromUrl = params.get('page');
+
+      if (pageFromUrl && Array.from(selectEl.options).some(opt => opt.value === pageFromUrl)) {
+        selectEl.value = pageFromUrl;
+        loadMock(pageFromUrl);
+      } else {
+        loadMock(selectEl.value);
+      }
+    });
+  </script>
+
+</body>
+</html>

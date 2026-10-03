@@ -11,126 +11,225 @@
       padding: 0;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background-color: #f6f8fa;
-      color: #24292f;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 24px;
-      background-color: #ffffff;
-      border-bottom: 1px solid #d0d7de;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      z-index: 10;
-    }
-
-    .title {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #57606a;
-    }
-
-    select {
-      padding: 6px 12px;
-      font-size: 0.9rem;
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-      background-color: #f6f8fa;
-      color: #24292f;
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
-    }
-
-    select:hover {
-      background-color: #f3f4f6;
-    }
-
-    select:focus {
-      border-color: #0969da;
-      box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
-    }
-
-    main {
-      flex: 1;
+    body, html {
       width: 100%;
-      height: calc(100vh - 57px);
-      position: relative;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
     }
 
     iframe {
       width: 100%;
       height: 100%;
       border: none;
+      display: block;
+    }
+
+    /* FAB Container */
+    .fab-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    /* FAB Button */
+    .fab-button {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #0969da;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      outline: none;
+    }
+
+    .fab-button:hover {
+      background-color: #085cc4;
+      transform: scale(1.05);
+    }
+
+    .fab-button:active {
+      transform: scale(0.95);
+    }
+
+    .fab-button svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      transition: transform 0.2s ease;
+    }
+
+    .fab-button.open svg {
+      transform: rotate(45deg);
+    }
+
+    /* Popup Menu */
+    .fab-menu {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
       background-color: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      padding: 8px 0;
+      min-width: 180px;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .fab-menu.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .menu-title {
+      padding: 8px 16px 4px 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #57606a;
+    }
+
+    .menu-item {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      color: #24292f;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .menu-item:hover {
+      background-color: #f3f4f6;
+    }
+
+    .menu-item.selected {
+      font-weight: 600;
+      color: #0969da;
+      background-color: #f0f7ff;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="title">Mock Showcase</div>
-    <div class="controls">
-      <label for="mockSelect">Select Mock:</label>
-      <select id="mockSelect">
-        <!-- Update or add your mock filenames here -->
-        <option value="mocks-1.html">Mock 1</option>
-        <option value="mocks-2.html">Mock 2</option>
-        <option value="mocks-3.html">Mock 3</option>
-      </select>
-    </div>
-  </header>
+  <!-- Mock Frame -->
+  <iframe id="mockFrame" title="Mock Preview"></iframe>
 
-  <main>
-    <iframe id="mockFrame" title="Mock Preview"></iframe>
-  </main>
+  <!-- FAB and Menu -->
+  <div class="fab-container" id="fabContainer">
+    <div class="fab-menu" id="fabMenu">
+      <div class="menu-title">Select Mock</div>
+      <!-- Add or edit your mock files here -->
+      <button class="menu-item" data-value="mocks-1.html">Mock 1</button>
+      <button class="menu-item" data-value="mocks-2.html">Mock 2</button>
+      <button class="menu-item" data-value="mocks-3.html">Mock 3</button>
+    </div>
+
+    <button class="fab-button" id="fabBtn" aria-label="Toggle mock menu">
+      <!-- Plus / Close icon -->
+      <svg viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+      </svg>
+    </button>
+  </div>
 
   <script>
-    const selectEl = document.getElementById('mockSelect');
+    const fabBtn = document.getElementById('fabBtn');
+    const fabMenu = document.getElementById('fabMenu');
     const iframeEl = document.getElementById('mockFrame');
+    const menuItems = document.querySelectorAll('.menu-item');
 
     function loadMock(filename) {
       iframeEl.src = filename;
-      
-      // Update URL search param without reloading page
+
+      // Highlight selected item in menu
+      menuItems.forEach(item => {
+        if (item.getAttribute('data-value') === filename) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+
+      // Update URL search parameter without reloading page
       const url = new URL(window.location);
       url.searchParams.set('page', filename);
       window.history.replaceState({}, '', url);
     }
 
-    // Handle dropdown changes
-    selectEl.addEventListener('change', (e) => {
-      loadMock(e.target.value);
+    function toggleMenu() {
+      const isOpen = fabMenu.classList.contains('active');
+      if (isOpen) {
+        fabMenu.classList.remove('active');
+        fabBtn.classList.remove('open');
+      } else {
+        fabMenu.classList.add('active');
+        fabBtn.classList.add('open');
+      }
+    }
+
+    function closeMenu() {
+      fabMenu.classList.remove('active');
+      fabBtn.classList.remove('open');
+    }
+
+    // Event listeners
+    fabBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
     });
 
-    // On page load: check URL param or default to first select option
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const selectedValue = item.getAttribute('data-value');
+        loadMock(selectedValue);
+        closeMenu();
+      });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!fabContainer.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    // On page load: check URL parameter or default to 'mocks-1.html'
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       const pageFromUrl = params.get('page');
 
-      if (pageFromUrl && Array.from(selectEl.options).some(opt => opt.value === pageFromUrl)) {
-        selectEl.value = pageFromUrl;
+      const isValidPage = Array.from(menuItems).some(
+        item => item.getAttribute('data-value') === pageFromUrl
+      );
+
+      if (pageFromUrl && isValidPage) {
         loadMock(pageFromUrl);
       } else {
-        loadMock(selectEl.value);
+        loadMock('mocks-1.html');
       }
     });
   </script>
